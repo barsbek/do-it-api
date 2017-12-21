@@ -38,6 +38,20 @@ class UsersController < ApplicationController
     @user.destroy
   end
 
+  def login
+    if login_errors.any?
+      return render json: login_errors, status: :unprocessable_entity
+    end
+
+    @user = User.find_by_email(params[:email])
+    if @user && @user.authenticate(params[:password])
+      session[:user_id] = @user.id
+      render json: @user, status: :logged_in, location: @user
+    else
+      render json: {notice: "Incorrect email or password"}, status: :unprocessable_entity
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
@@ -47,5 +61,13 @@ class UsersController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def user_params
       params.require(:user).permit(:email, :name, :password, :password_confirmation)
+    end
+
+    def login_errors
+      errors = {}
+      [:email, :password].each do |param|
+        errors[param] = ["can't be blank"] if params[:user][param].blank?
+      end
+      errors
     end
 end
