@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :authentication_request!, except: [:login, :create, :logout]
   before_action :set_user, only: [:show, :update, :destroy]
 
   # GET /users
@@ -43,13 +44,19 @@ class UsersController < ApplicationController
       return render json: login_errors, status: :unprocessable_entity
     end
 
-    @user = User.find_by_email(params[:email])
-    if @user && @user.authenticate(params[:password])
-      session[:user_id] = @user.id
-      render json: @user, status: :logged_in, location: @user
+    @user = User.find_by_email(params[:user][:email])
+    if @user && @user.authenticate(params[:user][:password])
+      token = User.encode_token({user_id: @user.id})
+      cookies[:auth_token] = { value: token, expires: 1.day.from_now, domain: 'localhost' }
+      render json: {notice: "Logged in"}, status: :ok, location: @user
     else
       render json: {notice: "Incorrect email or password"}, status: :unprocessable_entity
     end
+  end
+
+  def logout
+    cookies.delete :auth_token
+    render json: {notice: "Logged out"}, status: :ok
   end
 
   private
