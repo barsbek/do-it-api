@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
-  before_action :authentication_request!, except: [:login, :create, :logout]
+  before_action :require_login!, except: [:login, :create, :logout]
   before_action :set_user, only: [:show, :update, :destroy]
-
+  before_action :validate_login, only: [:login]
+  
   # GET /users
   def index
     @users = User.all
@@ -40,23 +41,29 @@ class UsersController < ApplicationController
   end
 
   def login
-    if login_errors.any?
-      return render json: login_errors, status: :unprocessable_entity
-    end
-
-    @user = User.find_by_email(params[:user][:email])
-    if @user && @user.authenticate(params[:user][:password])
-      token = User.encode_token({user_id: @user.id})
-      cookies[:auth_token] = { value: token, expires: 1.day.from_now, domain: 'localhost' }
-      render json: {notice: "Logged in"}, status: :ok, location: @user
+    user = User.find_by_email(params[:user][:email])
+    if user && user.authenticate(params[:user][:password])
+      set_cookies(user)
+      user_info = { id: user.id, name: user.name, email: user.email }
+      render json: { message: "Logged in", user: user_info },
+        status: :ok, location: user
     else
-      render json: {notice: "Incorrect email or password"}, status: :unprocessable_entity
+      render json: { message: "Incorrect email or password" },
+        status: :unprocessable_entity
     end
   end
 
   def logout
     cookies.delete :auth_token
-    render json: {notice: "Logged out"}, status: :ok
+    render json: { message: "Logged out" }, status: :ok
+  end
+
+  def set_cookies(user)
+    cookies[:auth_token] = {
+      value: User.encode_token( {user_id: user.id} ),
+      expires: 1.day.from_now,
+      domain: 'localhost'
+    }
   end
 
   private
@@ -68,6 +75,12 @@ class UsersController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def user_params
       params.require(:user).permit(:email, :name, :password, :password_confirmation)
+    end
+
+    def validate_login
+      if login_errors.any?
+        return render json: login_errors, status: :unprocessable_entity
+      end
     end
 
     def login_errors

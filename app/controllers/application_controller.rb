@@ -10,9 +10,9 @@ class ApplicationController < ActionController::API
 
   protected
 
-  def authentication_request!
+  def require_login!
     if current_user.nil?
-      return render json: { errors: 'Not authenticated' }, status: :unauthorized
+      return render json: { message: "Not authenticated" }, status: :unauthorized
     end
   end
 end
