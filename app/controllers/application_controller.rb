@@ -6,13 +6,14 @@ class ApplicationController < ActionController::API
       payload = User.decode_token(cookies[:auth_token])
       User.find(payload[:user_id]) if payload
     end
-  end  
+  end
 
   protected
 
   def require_login!
     if current_user.nil?
-      return render json: { message: "Not authenticated" }, status: :unauthorized
+      return render json: { message: "Not authenticated" },
+        status: :unauthorized, location: login_url
     end
   end
 end
