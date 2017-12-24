@@ -25,6 +25,8 @@ gem 'jwt', '~> 2.1'
 
 gem 'validates_timeliness', '~> 4.0'
 
+gem 'kaminari', '~> 1.1'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

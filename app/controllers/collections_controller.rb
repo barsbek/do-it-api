@@ -4,9 +4,13 @@ class CollectionsController < ApplicationController
 
   # GET /collections
   def index
-    @collections = Collection.all
-
-    render json: { collections: @collections, user: public_params(current_user) }
+    @collections = Collection.order(:created_at).page(current_page)
+    last_update = Collection.order(:updated_at).last.updated_at
+    render json: {
+      collections: @collections,
+      user: public_params(current_user),
+      last_update: last_update
+    }
   end
 
   # GET /collections/1
@@ -46,8 +50,13 @@ class CollectionsController < ApplicationController
       @collection = Collection.find(params[:id])
     end
 
+    def current_page
+      return 1 if params[:page].blank?
+      params[:page]
+    end      
+
     # Only allow a trusted parameter "white list" through.
     def collection_params
-      params.require(:collection).permit(:title, :finish_at)
+      params.require(:collection).permit(:title, :finish_at, :page)
     end
 end
