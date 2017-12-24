@@ -11,7 +11,8 @@ class CollectionsController < ApplicationController
 
   # GET /collections/1
   def show
-    render json: @collection
+    puts @collection.lists
+    render json: { collection: @collection, lists: @collection.lists }
   end
 
   # POST /collections

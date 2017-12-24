@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :lists
   scope :api do
     resources :users
     post :login, to: "users#login"
