@@ -81,10 +81,6 @@ class UsersController < ApplicationController
       params.require(:user).permit(:email, :name, :password, :password_confirmation)
     end
 
-    def public_params(user)
-      user.as_json(only: [:id, :name, :email])
-    end
-
     def validate_login
       if login_errors.any?
         return render json: login_errors, status: :unprocessable_entity

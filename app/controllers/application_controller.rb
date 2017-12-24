@@ -16,4 +16,8 @@ class ApplicationController < ActionController::API
         status: :unauthorized, location: login_url
     end
   end
+
+  def public_params(user)
+    user.as_json(only: [:id, :name, :email])
+  end
 end
