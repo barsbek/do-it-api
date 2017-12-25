@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171224011314) do
+ActiveRecord::Schema.define(version: 20171224203651) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(version: 20171224011314) do
     t.datetime "finish_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id"], name: "index_collections_on_user_id"
   end
 
   create_table "lists", force: :cascade do |t|
@@ -38,5 +40,6 @@ ActiveRecord::Schema.define(version: 20171224011314) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "collections", "users"
   add_foreign_key "lists", "collections"
 end

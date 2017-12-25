@@ -1,5 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
+  has_many :collections
+
   validates_presence_of :email
 
   def self.encode_token(payload, exp = 24.hours.from_now)
