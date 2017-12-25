@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :lists
   scope :api do
     resources :users
     post :login, to: "users#login"
@@ -7,5 +6,6 @@ Rails.application.routes.draw do
     get :current_user, to: "users#current"
 
     resources :collections
+    resources :lists
   end
 end
