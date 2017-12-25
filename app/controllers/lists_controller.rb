@@ -20,7 +20,8 @@ class ListsController < ApplicationController
     if @list.save
       render json: @list, status: :created, location: @list
     else
-      render json: @list.errors, status: :unprocessable_entity
+      render json: { message: "Couldn't create list"},
+        status: :unprocessable_entity
     end
   end
 
@@ -29,7 +30,8 @@ class ListsController < ApplicationController
     if @list.update(list_params)
       render json: @list
     else
-      render json: @list.errors, status: :unprocessable_entity
+      render json: { message: "Couldn't update list"},
+        status: :unprocessable_entity
     end
   end
 
