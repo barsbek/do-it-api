@@ -4,8 +4,8 @@ class CollectionsController < ApplicationController
 
   # GET /collections
   def index
-    @collections = user_collection.page(current_page)
-    last_update = user_collection.order(:updated_at).last.updated_at
+    @collections = user_collections.page(current_page)
+    last_update = user_collections.order(:updated_at).last.updated_at
 
     render json: {
       collections: @collections,
@@ -15,8 +15,12 @@ class CollectionsController < ApplicationController
 
   # GET /collections/1
   def show
-    puts @collection.lists
-    render json: { collection: @collection, lists: @collection.lists }
+    unless(@collection.nil?)
+      render json: { collection: @collection, lists: @collection.lists }
+    else
+      render json: { message: "Collection is not found" },
+        status: :not_found 
+    end
   end
 
   # POST /collections
@@ -47,15 +51,15 @@ class CollectionsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_collection
-      @collection = Collection.find(params[:id])
+      @collection = user_collections.detect{ |c| c.id.to_s == params[:id] }
     end
 
     def current_page
       return 1 if params[:page].blank?
       params[:page]
-    end   
-    
-    def user_collection
+    end
+
+    def user_collections
       current_user.collections
     end
 
