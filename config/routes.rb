@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :tasks
   scope :api do
     resources :users
     post :login, to: "users#login"
@@ -8,5 +7,6 @@ Rails.application.routes.draw do
 
     resources :collections
     resources :lists
+    resources :tasks
   end
 end
