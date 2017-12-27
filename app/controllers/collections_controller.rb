@@ -16,7 +16,7 @@ class CollectionsController < ApplicationController
   # GET /collections/1
   def show
     unless(@collection.nil?)
-      render json: { collection: @collection, lists: @collection.lists }
+      render json: { collection: @collection, lists: @collection.lists.page(1) }
     else
       render json: { message: "Collection is not found" },
         status: :not_found 
