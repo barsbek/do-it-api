@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
     resources :collections
     resources :lists
+    get '/lists/:id/tasks', to: "lists#tasks"
     resources :tasks
   end
 end

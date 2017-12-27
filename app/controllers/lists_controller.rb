@@ -1,6 +1,6 @@
 class ListsController < ApplicationController
   before_action :require_login!
-  before_action :set_list, only: [:show, :update, :destroy]
+  before_action :set_list, only: [:show, :update, :destroy, :tasks]
 
   # GET /lists
   def index
@@ -12,6 +12,10 @@ class ListsController < ApplicationController
   # GET /lists/1
   def show
     render json: @list
+  end
+
+  def tasks
+    render json: @list.tasks
   end
 
   # POST /lists
