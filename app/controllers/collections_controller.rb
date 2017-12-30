@@ -5,7 +5,6 @@ class CollectionsController < ApplicationController
   # GET /collections
   def index
     @collections = user_collections.page(current_page)
-    last_update = user_collections.order(:updated_at).last.updated_at
 
     render json: {
       collections: @collections,
@@ -26,7 +25,7 @@ class CollectionsController < ApplicationController
   # POST /collections
   def create
     @collection = Collection.new(collection_params)
-
+    @collection.user_id = current_user.id
     if @collection.save
       render json: @collection, status: :created, location: @collection
     else
@@ -45,7 +44,7 @@ class CollectionsController < ApplicationController
 
   # DELETE /collections/1
   def destroy
-    @collection.destroy
+    render json: { collection: @collection.destroy, last_update: last_update }
   end
 
   private
@@ -62,6 +61,10 @@ class CollectionsController < ApplicationController
     def user_collections
       current_user.collections
     end
+
+    def last_update
+      user_collections.order(:updated_at).last.updated_at
+    end      
 
     # Only allow a trusted parameter "white list" through.
     def collection_params
