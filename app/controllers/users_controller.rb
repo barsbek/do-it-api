@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   end
 
   def current
-    render json: { user: public_params(current_user) }
+    render json: public_params(current_user)
   end
 
   # POST /users
