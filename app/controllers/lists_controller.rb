@@ -11,7 +11,11 @@ class ListsController < ApplicationController
 
   # GET /lists/1
   def show
-    render json: @list
+    render json: {
+      list: @list,
+      tasks: @list.tasks,
+      last_update: tasks_last_update
+    }
   end
 
   def tasks
@@ -42,7 +46,10 @@ class ListsController < ApplicationController
 
   # DELETE /lists/1
   def destroy
-    @list.destroy
+    render json: {
+      list: @list.destroy,
+      last_update: last_update(@list.collection_id)
+    }
   end
 
   private
@@ -50,6 +57,29 @@ class ListsController < ApplicationController
     def set_list
       @list = List.find(params[:id])
     end
+
+    def last_update(collection_id)
+      # TODO: optimize
+      lists = Collection.find(collection_id).lists
+      if(lists.count > 0)
+        lists.order(:updated_at).last.updated_at
+      else
+        nil
+      end
+    end
+
+    def list_tasks
+      @list_tasks ||= @list.tasks
+    end
+
+    def tasks_last_update
+      if(list_tasks.count > 0) 
+        list_tasks.order(:updated_at).last.updated_at
+      else
+        nil
+      end
+    end
+
 
     # Only allow a trusted parameter "white list" through.
     def list_params

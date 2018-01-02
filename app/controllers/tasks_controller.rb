@@ -36,13 +36,22 @@ class TasksController < ApplicationController
 
   # DELETE /tasks/1
   def destroy
-    @task.destroy
+    render json: { task: @task.destroy, last_update: last_update }
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_task
       @task = Task.find(params[:id])
+    end
+
+    def last_update
+      tasks = List.find(@task.list_id).tasks
+      if(tasks.count > 0)
+        tasks.order(:updated_at).last.updated_at
+      else
+        nil
+      end
     end
 
     # Only allow a trusted parameter "white list" through.

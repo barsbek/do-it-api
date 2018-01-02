@@ -4,10 +4,9 @@ class CollectionsController < ApplicationController
 
   # GET /collections
   def index
-    @collections = user_collections.page(current_page)
-
     render json: {
-      collections: @collections,
+      collections: user_collections,
+      page: current_page,
       last_update: last_update
     }
   end
@@ -15,7 +14,12 @@ class CollectionsController < ApplicationController
   # GET /collections/1
   def show
     unless(@collection.nil?)
-      render json: { collection: @collection, lists: @collection.lists.page(1) }
+      render json: {
+        collection: @collection,
+        page: current_page,
+        lists: collection_lists,
+        last_update: lists_last_update
+      }
     else
       render json: { message: "Collection is not found" },
         status: :not_found 
@@ -54,17 +58,36 @@ class CollectionsController < ApplicationController
     end
 
     def current_page
-      return 1 if params[:page].blank?
-      params[:page]
+      @current_page || if params[:page].blank?
+        @current_page = 1
+      else
+        @current_page = params[:page]
+      end
     end
-
+    # remove pagination
     def user_collections
       current_user.collections
     end
 
     def last_update
-      user_collections.order(:updated_at).last.updated_at
-    end      
+      if user_collections.count > 0
+        user_collections.order(:updated_at).last.updated_at
+      else
+        nil
+      end
+    end
+
+    def collection_lists
+      @collection_lists ||= @collection.lists.page(current_page)
+    end
+
+    def lists_last_update
+      if collection_lists.count  > 0
+        collection_lists.first.updated_at
+      else
+        nil
+      end
+    end   
 
     # Only allow a trusted parameter "white list" through.
     def collection_params
