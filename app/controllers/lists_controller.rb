@@ -2,13 +2,6 @@ class ListsController < ApplicationController
   before_action :require_login!
   before_action :set_list, only: [:show, :update, :destroy, :tasks]
 
-  # GET /lists
-  def index
-    @lists = List.all
-
-    render json: @lists
-  end
-
   # GET /lists/1
   def show
     render json: {
@@ -25,6 +18,7 @@ class ListsController < ApplicationController
   # POST /lists
   def create
     @list = List.new(list_params)
+    @list.user_id = current_user.id
 
     if @list.save
       render json: @list, status: :created, location: @list
@@ -46,29 +40,34 @@ class ListsController < ApplicationController
 
   # DELETE /lists/1
   def destroy
-    render json: {
-      list: @list.destroy,
-      last_update: last_update(@list.collection_id)
-    }
+    if @list.destroy
+      render json: { list: @list, last_update: last_update(@list.collection_id) }
+    else
+      render json: { message: "Couldn't remove list" },
+        status: :unprocessable_entity
+    end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_list
-      @list = List.find(params[:id])
+      @list = current_user.lists.find(params[:id])
     rescue
       render json: { message: "Couldn't find list" },
         status: :unprocessable_entity
     end
 
-    def last_update(collection_id)
-      # TODO: optimize
-      lists = Collection.find(collection_id).lists
+    def last_update(c_id)
+      collection = current_user.collections.find(c_id)
+      lists = collection.lists
       if(lists.count > 0)
         lists.order(:updated_at).last.updated_at
       else
         nil
       end
+    rescue
+      render json: { message: "Collection is not found" },
+        status: :unprocessable_entity
     end
 
     def list_tasks

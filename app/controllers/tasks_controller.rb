@@ -2,13 +2,6 @@ class TasksController < ApplicationController
   before_action :require_login!
   before_action :set_task, only: [:show, :update, :destroy]
 
-  # GET /tasks
-  def index
-    @tasks = Task.all
-
-    render json: @tasks
-  end
-
   # GET /tasks/1
   def show
     render json: @task
@@ -17,6 +10,7 @@ class TasksController < ApplicationController
   # POST /tasks
   def create
     @task = Task.new(task_params)
+    @task.user_id = current_user.id
 
     if @task.save
       render json: @task, status: :created, location: @task
@@ -36,22 +30,34 @@ class TasksController < ApplicationController
 
   # DELETE /tasks/1
   def destroy
-    render json: { task: @task.destroy, last_update: last_update }
+    if @task.destroy
+      render json: { task: @task, last_update: last_update(@task.list_id) }
+    else
+      render json: { message: "Coudn't remove task" },
+        status: :unprocessable_entity
+    end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_task
-      @task = Task.find(params[:id])
+      @task = current_user.tasks.find(params[:id])
+    rescue
+      render json: { message: "Couldn't find task" },
+        status: :unprocessable_entity
     end
 
-    def last_update
-      tasks = List.find(@task.list_id).tasks
+    def last_update(list_id)
+      list = current_user.lists.find(list_id)
+      tasks = list.tasks
       if(tasks.count > 0)
         tasks.order(:updated_at).last.updated_at
       else
         nil
       end
+    rescue
+      render json: { message: "List is not found" },
+        status: :unprocessable_entity
     end
 
     # Only allow a trusted parameter "white list" through.
