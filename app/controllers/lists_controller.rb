@@ -56,6 +56,9 @@ class ListsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_list
       @list = List.find(params[:id])
+    rescue
+      render json: { message: "Couldn't find list" },
+        status: :unprocessable_entity
     end
 
     def last_update(collection_id)
