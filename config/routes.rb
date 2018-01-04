@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     resources :users
     post :login, to: "users#login"
     delete :logout, to: "users#logout"
-    get :current_user, to: "users#current"
+    get :current_user, to: "users#show"
 
     resources :collections
     resources :lists

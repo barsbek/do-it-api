@@ -1,21 +1,9 @@
 class UsersController < ApplicationController
   before_action :require_login!, except: [:login, :create, :logout]
-  before_action :set_user, only: [:show, :update, :destroy]
   before_action :validate_login, only: [:login]
-  
-  # GET /users
-  def index
-    @users = User.all
-
-    render json: { users: @users, user: public_params(current_user)}
-  end
 
   # GET /users/1
   def show
-    render json: @user
-  end
-
-  def current
     render json: public_params(current_user)
   end
 
@@ -35,16 +23,11 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1
   def update
-    if @user.update(user_params)
+    if current_user.update(user_params)
       render json: @user
     else
       render json: @user.errors, status: :unprocessable_entity
     end
-  end
-
-  # DELETE /users/1
-  def destroy
-    @user.destroy
   end
 
   def login
@@ -75,11 +58,6 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
-
     # Only allow a trusted parameter "white list" through.
     def user_params
       params.require(:user).permit(:email, :name, :password, :password_confirmation)
