@@ -27,6 +27,8 @@ gem 'validates_timeliness', '~> 4.0'
 
 gem 'kaminari', '~> 1.1'
 
+gem 'acts_as_list', '~> 0.9'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
