@@ -1,7 +1,7 @@
 class Task < ApplicationRecord
-  default_scope { order(:order, :created_at) }
-  
   belongs_to :list
+  acts_as_list scope: :list
+  
   belongs_to :user
 
   validates_presence_of :title
