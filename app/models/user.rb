@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
-  has_many :collections, dependent: :destroy
+  has_many :collections, -> { order(position: :asc) }, dependent: :destroy
   has_many :lists, dependent: :destroy
   has_many :tasks
 
