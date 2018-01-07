@@ -18,6 +18,6 @@ class ApplicationController < ActionController::API
   end
 
   def public_params(user)
-    user.as_json(only: [:id, :name, :email])
+    user.as_json(only: [:id, :name, :email], methods: :avatar_thumb)
   end
 end

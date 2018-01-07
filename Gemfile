@@ -29,6 +29,8 @@ gem 'kaminari', '~> 1.1'
 
 gem 'acts_as_list', '~> 0.9'
 
+gem 'paperclip', '~> 5.0'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
