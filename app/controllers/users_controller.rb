@@ -36,7 +36,7 @@ class UsersController < ApplicationController
       set_cookies(user)
       user_info = { id: user.id, name: user.name, email: user.email }
       render json: { message: "Logged in", user: user_info },
-        location: user
+        location: user.collections.first
     else
       render json: { message: "Incorrect email or password" },
         status: :unprocessable_entity
